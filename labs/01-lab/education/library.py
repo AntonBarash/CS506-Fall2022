@@ -1,5 +1,7 @@
 def draw_library():
     draw_library_building()
+    for i in range(5):
+        draw_book()
     return
 
 def draw_library_building():
@@ -24,3 +26,6 @@ def draw_library_building():
     print("|.','          /%%%%%%%%%%%%%%%\          ','.|")
     print("|;____________/%%%%%Spicer%%%%%%\____________;|")
     return
+
+def draw_book():
+    print("   ,   ,\n  /////|\n ///// |\n|~~~~| |\n|====| |\n|    | |\n|book| |\n|    | /\n|====|/\n\'----\'")
