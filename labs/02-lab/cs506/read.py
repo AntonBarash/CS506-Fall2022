@@ -8,6 +8,11 @@ def read_csv(csv_file_path):
     data = csv.reader(f)
     res = []
     for row in data:
+        for i in range(len(row)):
+            try:
+                row[i] = int(row[i])
+            except:
+                continue
         res.append(row)
     return res
 
