@@ -11,7 +11,17 @@ def get_centroid(points):
     
     Returns a new point which is the center of all the points.
     """
-    raise NotImplementedError()
+    centroid = []
+    for dim in points[0]:
+        centroid.append(0)
+    for point in points:
+        for i in range(len(point)):
+            centroid[i] += point[i]
+    for i in range(len(centroid)):
+        centroid[i] /= len(points)
+    return centroid
+            
+            
 
 
 def get_centroids(dataset, assignments):
@@ -21,7 +31,20 @@ def get_centroids(dataset, assignments):
     Compute the centroid for each of the assigned groups.
     Return `k` centroids in a list
     """
-    raise NotImplementedError()
+    clusters = []
+    uniqueclusters = set()
+    for assignment in assignments:
+        if assignment not in uniqueclusters:
+            clusters.append([])
+            uniqueclusters.add(assignment)
+    for i in range(len(assignments)):
+        clusters[assignments[i]].append(dataset[i])
+    centroids = []
+    for cluster in clusters:
+        centroids.append(get_centroid(cluster))
+    return centroids
+    
+    
 
 
 def assign_points(data_points, centers):
@@ -44,15 +67,27 @@ def distance(a, b):
     """
     Returns the Euclidean distance between a and b
     """
-    raise NotImplementedError()
+    res = 0
+    for i in range(len(a)):
+        res += (a[i] - b[i])**2
+    return res**(1/2)
 
 
 def distance_squared(a, b):
-    raise NotImplementedError()
+    return distance(a,b)**2
 
 
 def cost_function(clustering):
-    raise NotImplementedError()
+    cost = 0
+    centroids = []
+    for cluster in clustering:
+        centroids.append(get_centroid(cluster))
+    for i in range(len(clustering)):
+        cur_centroid = centroids[i]
+        for point in cluster:
+            cost += distance(cur_centroid, point)
+    return cost
+        
 
 
 def generate_k(dataset, k):
@@ -60,7 +95,16 @@ def generate_k(dataset, k):
     Given `data_set`, which is an array of arrays,
     return a random set of k points from the data_set
     """
-    raise NotImplementedError()
+    return_list = []
+    unused_indexes = []
+    for i in range(len(dataset)):
+        unused_indexes.append(i)
+    for i in range(k):
+        index_of_indextoadd = random.randint(0, len(unused_indexes) - 1)
+        indextoadd = unused_indexes[index_of_indextoadd]
+        del unused_indexes[index_of_indextoadd]
+        return_list.append(dataset[indextoadd])
+    return return_list
 
 
 def generate_k_pp(dataset, k):
@@ -70,7 +114,10 @@ def generate_k_pp(dataset, k):
     where points are picked with a probability proportional
     to their distance as per kmeans pp
     """
-    raise NotImplementedError()
+    first_center_ind = random.randint(0, len(dataset) - 1)
+    first_center = dataset[first_center_ind]
+    
+    
 
 
 def _do_lloyds_algo(dataset, k_points):
