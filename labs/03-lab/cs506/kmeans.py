@@ -2,7 +2,7 @@ from collections import defaultdict
 from math import inf
 import random
 import csv
-
+from numpy.random import choice
 
 def get_centroid(points):
     """
@@ -11,7 +11,10 @@ def get_centroid(points):
     
     Returns a new point which is the center of all the points.
     """
+    print(points)
     centroid = []
+    #if type(points[0] == int):
+    #    return sum(points)/len(points)
     for dim in points[0]:
         centroid.append(0)
     for point in points:
@@ -80,11 +83,13 @@ def distance_squared(a, b):
 def cost_function(clustering):
     cost = 0
     centroids = []
-    for cluster in clustering:
-        centroids.append(get_centroid(cluster))
+    print('hey whatsup')
+    print(clustering)
+    for i in range(len(clustering)):
+        centroids.append(get_centroid(clustering[i]))
     for i in range(len(clustering)):
         cur_centroid = centroids[i]
-        for point in cluster:
+        for point in clustering[i]:
             cost += distance(cur_centroid, point)
     return cost
         
@@ -107,6 +112,13 @@ def generate_k(dataset, k):
     return return_list
 
 
+def pick_number_proportionally(dataset):
+    prob_distr = [item/sum(dataset) for item in dataset]
+    num = choice(dataset, p=prob_distr)
+    for i in range(len(dataset)):
+        if dataset[i] == num:
+            return i
+
 def generate_k_pp(dataset, k):
     """
     Given `data_set`, which is an array of arrays,
@@ -114,10 +126,28 @@ def generate_k_pp(dataset, k):
     where points are picked with a probability proportional
     to their distance as per kmeans pp
     """
+    unused_indexes = []
+    for i in range(len(dataset)):
+        unused_indexes.append(i)
     first_center_ind = random.randint(0, len(dataset) - 1)
     first_center = dataset[first_center_ind]
-    
-    
+    del unused_indexes[first_center_ind]
+    centers = [first_center]
+    while k != 1:
+        next_potential_centers = []
+        for i in unused_indexes:
+            next_potential_centers.append(dataset[i])
+        distance_for_each_potential = []
+        for pot in next_potential_centers:
+            min_dist = distance(pot, centers[0])
+            for i in range(1, len(centers)):
+                min_dist = min(min_dist, distance(pot, centers[i]))
+            distance_for_each_potential.append(min_dist**2)
+        picked_index = pick_number_proportionally(distance_for_each_potential)
+        centers.append(next_potential_centers[picked_index])
+        del unused_indexes[picked_index]
+        k -= 1
+    return centers
 
 
 def _do_lloyds_algo(dataset, k_points):
@@ -147,3 +177,13 @@ def k_means_pp(dataset, k):
 
     k_points = generate_k_pp(dataset, k)
     return _do_lloyds_algo(dataset, k_points)
+
+
+def clustered_all_points(clustering, dataset):
+    points = []
+    for assignment in clustering:
+        points += clustering[assignment]
+    for point in points:
+        if point not in dataset:
+            return False
+    return True
